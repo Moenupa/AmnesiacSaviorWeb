@@ -17,5 +17,9 @@
     "nuxt": "^2.15.3",
     "vue2-datepicker": "^3.9.0"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "engines": {
+    "node": "14.x",
+    "npm": "6.x"
+  }
 }
