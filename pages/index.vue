@@ -1,17 +1,15 @@
 <!-- Use preprocessors via the lang attribute! e.g. <template lang="pug"> -->
 <template>
 	<div id="app" class="container">
-    <button @click="$fetch">refresh</button>
     <div id="calendar">
       <date-picker v-model="curTargetDate" placeholder="Select Date"></date-picker>
     </div>
-		<div id="todo-list" v-cloak>
+		<div id="todo-list" v-if="this.curTargetDate" v-cloak>
       <div id="todo-header">
         <time>
-          <b>{{ days[curTargetDate.getDay()] }},</b>
-          {{ curTargetDate.getDate() }}{{ getDateAppendix() }}
+          <b>{{ months[curTargetDate.getMonth()] }} {{ curTargetDate.getDate() }}{{ getDateAppendix() }}</b>
           <br />
-          <span>{{ months[curTargetDate.getMonth()] }}</span>
+          <span>{{ days[curTargetDate.getDay()] }}</span>
         </time>
         <p>
           <b>{{ tasks.length }}</b>
@@ -33,7 +31,7 @@
             <article v-if="isTargetDate(index)" transition="task">
               <button v-show="!task.description" v-on:click="deleteTask($index)">+</button>
               <label v-show="task.description" transition="task">
-                <input type="checkbox" v-model="task.finished" />
+                <input type="checkbox" v-model="task.finished" v-on:change="writeToFirestore()" />
                 <span></span>
               </label>
               <input
@@ -44,7 +42,7 @@
                 v-bind:class="{ finished: task.finished }"
                 v-bind:disabled="task.finished"
               />
-              <time>{{ task.addDate }}</time>
+              <time>{{ getDate(task.addDate) }}</time>
             </article>
           </span>
         </section>
@@ -84,11 +82,11 @@ export default {
         "November",
         "December"
       ],
-      curTargetDate: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())
+      curTargetDate: null
     }
 	},
   async fetch () {
-    const messageRef = this.$fire.firestore.collection('test1').doc('Osnfjf3TABrRaIy3UyhO');
+    const messageRef = this.$fire.firestore.collection('todolist').doc('qvhvIWuafQf2y9SVFJIe');
     try {
       const messageDoc = await messageRef.get();
       this.tasks = messageDoc.data().tasks;
@@ -99,7 +97,7 @@ export default {
   },
 	methods: {
     async writeToFirestore() {
-      const messageRef = this.$fire.firestore.collection('test1').doc('Osnfjf3TABrRaIy3UyhO');
+      const messageRef = this.$fire.firestore.collection('todolist').doc('qvhvIWuafQf2y9SVFJIe');
       try {
         await messageRef.set({tasks:this.tasks});
       } catch (e) {
@@ -109,19 +107,10 @@ export default {
     },
 		addTask() {
 			if (this.newTask) {
-				var d = new Date(),
-					y = d.getFullYear(),
-					mo = d.getMonth() + 1,
-					da = d.getDate(),
-					h = d.getHours(),
-					m = ("0" + d.getMinutes()).slice(-2),
-					s;
-				h > 12 ? ((h -= 12), (s = "PM")) : ((h = h), (s = "AM"));
-
 				var task = {
 					description: this.newTask,
           targetDate: this.curTargetDate.getTime(),
-					addDate: y + "-" + mo + "-" + da + " " + h + ":" + m + " " + s,
+					addDate: new Date().getTime(),
 					finished: false
 				};
 
@@ -166,14 +155,31 @@ export default {
           return "rd";
         default:
           return "th";
+      }
+    },
+    getDate(datetime) {
+      var d = new Date(datetime),
+					y = d.getFullYear(),
+					mo = d.getMonth() + 1,
+					da = d.getDate(),
+					h = d.getHours(),
+					m = ("0" + d.getMinutes()).slice(-2),
+					s;
+				h > 12 ? ((h -= 12), (s = "PM")) : ((h = h), (s = "AM"));
+      return 
     }
-	},
 	}
 };
 </script>
 
 <!-- Use preprocessors via the lang attribute! e.g. <style lang="scss"> -->
 <style>
+:root {
+  --width: 480px;
+}
+* {
+  border-radius: 8px;
+}
 .mx-icon-left:before,
 .mx-icon-right:before,
 .mx-icon-double-left:before,
@@ -217,7 +223,6 @@ export default {
   background-color: transparent;
   outline: none;
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
   color: #73879c;
   white-space: nowrap;
 }
@@ -249,7 +254,6 @@ export default {
   bottom: 2px;
   width: 6px;
   z-index: 1;
-  border-radius: 8px;
   opacity: 0;
   transition: opacity 0.24s ease-out;
 }
@@ -258,7 +262,6 @@ export default {
   width: 100%;
   height: 0;
   cursor: pointer;
-  border-radius: 8px;
   background-color: rgba(144, 147, 153, 0.3);
   transition: background-color 0.3s;
 }
@@ -277,13 +280,14 @@ export default {
   transform: scaleY(0);
 }
 .mx-datepicker {
-  padding-left: 30px;
-  padding-right: 30px;
+  padding: 8px 30px;
   position: relative;
+  background: #f9f9f9;
 }
 .mx-datepicker svg {
   width: 1em;
   height: 1em;
+  border-radius: 0;
   vertical-align: -0.15em;
   fill: currentColor;
   overflow: hidden;
@@ -361,8 +365,7 @@ export default {
 .mx-datepicker-popup {
   left: unset !important;
   position: absolute;
-  margin: 1px auto;
-  border-radius: 8px;
+  margin: 4px auto;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
   z-index: 2001;
 }
@@ -444,7 +447,6 @@ export default {
   box-sizing: border-box;
 }
 .mx-calendar-content .cell {
-  border-radius: 8px;
   cursor: pointer;
 }
 .mx-calendar-content .cell:hover {
@@ -649,13 +651,11 @@ body {
 	min-height: 100vh;
 }
 
-#todo-list div {
+#todo-list > div,
+#calendar {
 	display: block;
-	width: 100%;
-	min-width: 280px;
-	max-width: 480px;
+  width: var(--width);
 	background-color: #fefeff;
-	border-radius: 8px;
 	overflow: hidden;
 	box-shadow: 0 15px 150px rgba(0, 0, 0, 0.15);
 }
@@ -670,6 +670,7 @@ body {
 	background: -o-linear-gradient(to bottom, #fff, #fafaff);
 	background: linear-gradient(to bottom, #fff, #fafaff);
 	border-bottom: 1px solid #e0e9f1;
+  margin: 4px 0;
 }
 #todo-header b {
 	font-weight: 500;
@@ -967,22 +968,8 @@ body {
 	display: none;
 }
 
-#title {
-  padding: 10px;
-	background-color: #999999;
-}
-#calendar {
-  padding: 10px;
-	background-color: #ff8080;
-}
-#todo-list {
-  padding: 10px;
-	background-color: #8080ff;
-}
 body {
 	min-height: 100vh;
-}
-body {
 	display: flex;
 	justify-content: center;
 	align-items: center;
