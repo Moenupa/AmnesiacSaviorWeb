@@ -166,7 +166,7 @@ export default {
 					m = ("0" + d.getMinutes()).slice(-2),
 					s;
 				h > 12 ? ((h -= 12), (s = "PM")) : ((h = h), (s = "AM"));
-      return 
+      return y+"-"+mo+"-"+da+" "+h+":"+m+" "+s;
     }
 	}
 };
@@ -966,13 +966,5 @@ body {
 
 [v-cloak] {
 	display: none;
-}
-
-body {
-	min-height: 100vh;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	flex-direction: column;
 }
 </style>
