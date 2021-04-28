@@ -28,22 +28,24 @@
           v-on:keyup.enter="addTask"
         />
         <section v-if="tasks.length">
-          <article v-for="(task, index) in tasks" transition="task" :key="index">
-            <button v-show="!task.description" v-on:click="deleteTask($index)">+</button>
-            <label v-show="task.description" transition="task">
-              <input type="checkbox" v-model="task.finished" />
-              <span></span>
-            </label>
-            <input
-              type="text"
-              placeholder="New task"
-              value="task.description"
-              v-model="task.description"
-              v-bind:class="{ finished: task.finished }"
-              v-bind:disabled="task.finished"
-            />
-            <time>{{ task.addDate }}</time>
-          </article>
+          <span v-for="(task, index) in tasks" :key="index">
+            <article v-if="isTargetDate(index)" transition="task">
+              <button v-show="!task.description" v-on:click="deleteTask($index)">+</button>
+              <label v-show="task.description" transition="task">
+                <input type="checkbox" v-model="task.finished" />
+                <span></span>
+              </label>
+              <input
+                type="text"
+                placeholder="New task"
+                value="task.description"
+                v-model="task.description"
+                v-bind:class="{ finished: task.finished }"
+                v-bind:disabled="task.finished"
+              />
+              <time>{{ task.addDate }}</time>
+            </article>
+          </span>
         </section>
       </div>
     </div>
@@ -118,8 +120,9 @@ export default {
 			for (var i = 0; i < this.tasks.length; i++)
 				if (this.tasks[i].finished) return true;
 		},
-    isTargetDate(task) {
-      return task.targetDate === this.curTargetDate;
+    isTargetDate(index) {
+      console.log("comparison triggerd. "+"index at: " + index + " which " + this.tasks[index]);
+      if (this.tasks[index].targetDate.getTime() === this.curTargetDate.getTime()) return true;
     },
     getDateAppendix() {
       switch (this.curTargetDate.getDate()) {
