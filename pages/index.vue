@@ -1,6 +1,7 @@
 <!-- Use preprocessors via the lang attribute! e.g. <template lang="pug"> -->
 <template>
 	<div id="app" class="container">
+    <button @click="$fetch">refresh</button>
     <div id="calendar">
       <date-picker v-model="curTargetDate" placeholder="Select Date"></date-picker>
     </div>
@@ -86,7 +87,26 @@ export default {
       curTargetDate: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())
     }
 	},
+  async fetch () {
+    const messageRef = this.$fire.firestore.collection('test1').doc('Osnfjf3TABrRaIy3UyhO');
+    try {
+      const messageDoc = await messageRef.get();
+      this.tasks = messageDoc.data().tasks;
+    } catch (e) {
+      console.log(e);
+      return;
+    }
+  },
 	methods: {
+    async writeToFirestore() {
+      const messageRef = this.$fire.firestore.collection('test1').doc('Osnfjf3TABrRaIy3UyhO');
+      try {
+        await messageRef.set({tasks:this.tasks});
+      } catch (e) {
+        console.log(e);
+        return;
+      }
+    },
 		addTask() {
 			if (this.newTask) {
 				var d = new Date(),
@@ -100,29 +120,38 @@ export default {
 
 				var task = {
 					description: this.newTask,
-          targetDate: this.curTargetDate,
+          targetDate: this.curTargetDate.getTime(),
 					addDate: y + "-" + mo + "-" + da + " " + h + ":" + m + " " + s,
 					finished: false
 				};
 
 				this.tasks.push(task);
 				this.newTask = "";
+        this.writeToFirestore();
 			}
 		},
 		deleteTask(index) {
 			this.tasks.splice(index, 1);
+      this.writeToFirestore();
 		},
 		clearList() {
+      var updated = false;
 			for (var i = this.tasks.length - 1; i > -1; i--)
-				if (this.tasks[i].finished) this.tasks.splice(i, 1);
+				if (this.tasks[i].finished) 
+        {
+          updated = true;
+          this.tasks.splice(i, 1);
+        }
+      if (updated)
+        this.writeToFirestore();
 		},
     taskChecked() {
 			for (var i = 0; i < this.tasks.length; i++)
 				if (this.tasks[i].finished) return true;
 		},
     isTargetDate(index) {
-      console.log("comparison triggerd. "+"index at: " + index + " which " + this.tasks[index]);
-      if (this.tasks[index].targetDate.getTime() === this.curTargetDate.getTime()) return true;
+      if (this.tasks[index].targetDate === this.curTargetDate.getTime())
+        return true;
     },
     getDateAppendix() {
       switch (this.curTargetDate.getDate()) {
@@ -139,8 +168,6 @@ export default {
           return "th";
     }
 	},
-	created() {
-		}
 	}
 };
 </script>
