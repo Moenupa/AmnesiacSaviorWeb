@@ -1,10 +1,16 @@
 <!-- Use preprocessors via the lang attribute! e.g. <template lang="pug"> -->
+<script src="https://www.gstatic.com/firebasejs/8.4.2/firebase-app.js"/>
+<script src="https://www.gstatic.com/firebasejs/8.4.2/firebase-analytics.js"/>
+<script src="https://www.gstatic.com/firebasejs/8.4.0/firebase-auth.js"/>
+<script src="https://www.gstatic.com/firebasejs/8.4.0/firebase-firestore.js"/>
+<script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-database.js"/>
+<script src="firebase.js"></script>
 <template>
 	<div id="app" class="container">
 		<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
 			navbar
 		</nav>
-		<div id="title" class="card">This is the title</div>
+		<div id="title" class="card">This is the title<button onclick="signinWithGoogle()">sign in</button></div>
 		<div id="calendar" class="card">this is a calendar</div>
 		<div id="todo-list" v-cloak>
       <div id="todo-header">
@@ -105,10 +111,13 @@ export default {
 					finished: false
 				};
 
+				createNewEvent(da,"web",this.newTask);
+
 				this.tasks.push(task);
 				this.newTask = "";
 			}
 		},
+
 		deleteTask: function (index) {
 			this.tasks.splice(index, 1);
 		},
