@@ -32,6 +32,28 @@ export default {
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
+    [
+      '@nuxtjs/firebase',
+      {
+        config: {
+          apiKey: "AIzaSyBmqzRLUCLkYP64SzD7cCb3Fauz4ohDfDs",
+          authDomain: "amnesiacsavior3421.firebaseapp.com",
+          projectId: "amnesiacsavior3421",
+          storageBucket: "amnesiacsavior3421.appspot.com",
+          messagingSenderId: "529656710642",
+          appId: "1:529656710642:web:6fb5a8aa586f84227cd76b",
+          measurementId: "G-ENC0T71582"
+        },
+        services: {
+          auth: true,
+          firestore: true,
+          functions: true,
+          storage: true,
+          database: true,
+          remoteConfig: true
+        }
+      }
+    ]
   ],
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
