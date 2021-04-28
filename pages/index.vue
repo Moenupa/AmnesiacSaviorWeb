@@ -1,10 +1,18 @@
 <!-- Use preprocessors via the lang attribute! e.g. <template lang="pug"> -->
 <template>
 	<div id="app" class="container">
-    <div id="calendar">
+    <div id="tokenizor" v-if="!lock">
+      <input
+        type="text"
+        placeholder="Customize your Unique Token"
+        v-model="token"
+        v-on:keyup.enter="addToken()"
+      >
+    </div>
+    <div id="calendar" v-if="lock">
       <date-picker v-model="curTargetDate" placeholder="Select Date"></date-picker>
     </div>
-		<div id="todo-list" v-if="this.curTargetDate" v-cloak>
+		<div id="todo-list" v-if="lock && curTargetDate" v-cloak>
       <div id="todo-header">
         <time>
           <b>{{ months[curTargetDate.getMonth()] }} {{ curTargetDate.getDate() }}{{ getDateAppendix() }}</b>
@@ -82,27 +90,46 @@ export default {
         "November",
         "December"
       ],
-      curTargetDate: null
+      curTargetDate: null,
+      token: null,
+      lock: false
     }
 	},
-  async fetch () {
-    const messageRef = this.$fire.firestore.collection('todolist').doc('qvhvIWuafQf2y9SVFJIe');
-    try {
-      const messageDoc = await messageRef.get();
-      this.tasks = messageDoc.data().tasks;
-    } catch (e) {
-      console.log(e);
-      return;
-    }
-  },
+  // async fetch () {
+  //   const messageRef = this.$fire.firestore.collection('todolist').doc('qvhvIWuafQf2y9SVFJIe');
+  //   try {
+  //     const messageDoc = await messageRef.get();
+  //     this.tasks = messageDoc.data().tasks;
+  //   } catch (e) {
+  //     console.log(e);
+  //     return;
+  //   }
+  // },
 	methods: {
+    async readFromFirestore() {
+      const messageRef = this.$fire.firestore.collection('todolist').doc(this.token);
+      try {
+        const messageDoc = await messageRef.get();
+        this.tasks = messageDoc.data().tasks;
+      } catch (e) {
+        console.log(e);
+        return;
+      }
+    },
     async writeToFirestore() {
-      const messageRef = this.$fire.firestore.collection('todolist').doc('qvhvIWuafQf2y9SVFJIe');
+      const messageRef = this.$fire.firestore.collection('todolist').doc(this.token);
       try {
         await messageRef.set({tasks:this.tasks});
       } catch (e) {
         console.log(e);
         return;
+      }
+    },
+    addToken() {
+      if (this.token)
+      {
+        this.lock = true;
+        this.readFromFirestore();
       }
     },
 		addTask() {
@@ -175,8 +202,24 @@ export default {
 <!-- Use preprocessors via the lang attribute! e.g. <style lang="scss"> -->
 <style>
 :root {
-  --width: 480px;
+  --width: 360px;
 }
+@media (min-width: 768px) {
+  :root {
+    --width: 480px;
+  }
+}
+@media (min-width: 992px) {
+  :root {
+    --width: 640px;
+  }
+}
+@media (min-width: 1200px) {
+  :root {
+    --width: 720px;
+  }
+}
+
 * {
   border-radius: 8px;
 }
@@ -391,6 +434,7 @@ export default {
 }
 .mx-range-wrapper {
   display: flex;
+  display: -webkit-flex;
 }
 @media (max-width: 750px) {
   .mx-range-wrapper {
@@ -544,7 +588,7 @@ export default {
   overflow: hidden;
 }
 .mx-time-columns {
-  display: -webkit-box;
+  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   width: 100%;
@@ -647,10 +691,6 @@ export default {
 	transition: all 200ms linear;
 }
 
-body {
-	min-height: 100vh;
-}
-
 #todo-list > div,
 #calendar {
 	display: block;
@@ -660,8 +700,29 @@ body {
 	box-shadow: 0 15px 150px rgba(0, 0, 0, 0.15);
 }
 
+#tokenizor {
+  display: -webkit-flex;
+  display: flex;
+  height: 96px;
+  width: var(--width);
+  border-radius: 8px;
+}
+
+#tokenizor input {
+  text-align: center;
+  font-size: 16px;
+  width: 100%;
+  border: none;
+  outline: none;
+  background: #f0f0f0;
+  box-shadow: 8px 8px 16px #cccccc,
+              -8px -8px 16px #ffffff,
+              inset 4px 4px 8px #cccccc,
+              inset -4px -4px 8px #ffffff;
+}
+
 #todo-header {
-	height: 130px;
+	height: 128px;
 	width: 100%;
 	padding: 30px 120px 30px 30px;
 	background: #fff;

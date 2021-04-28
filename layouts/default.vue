@@ -5,6 +5,7 @@
 <style>
 body {
 	min-height: 100vh;
+  display: -webkit-flex;
 	display: flex;
 	justify-content: center;
 	align-items: center;
