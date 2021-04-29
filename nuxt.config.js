@@ -9,7 +9,9 @@ export default {
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: 'Todo-list in the Cloud, Showing your tasks day by day' },
-      { hid: 'og:image', property: 'og:image', content: 'Amnesiac_Savior.png' }
+      { hid: 'og:image', property: 'og:image', content: 'https://amnesiac-savior.herokuapp.com/Amnesiac_Savior.png' },
+      { hid: 'og:image:secure_url', property: 'og:image:secure_url', content: 'https://amnesiac-savior.herokuapp.com/Amnesiac_Savior.png' },
+      { hid: 'og:image:alt', property: 'og:image:alt', content: 'Amnesiac Savior' }
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/angel.ico' }
