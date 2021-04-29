@@ -163,7 +163,8 @@ export default {
 		},
     taskChecked() {
 			for (var i = 0; i < this.tasks.length; i++)
-				if (this.tasks[i].finished) return true;
+				if (this.tasks[i].finished && this.tasks[i].targetDate === curTargetDate.getTime())
+          return true;
 		},
     isTargetDate(index) {
       if (this.tasks[index].targetDate === this.curTargetDate.getTime())
