@@ -12,7 +12,7 @@
     "@firebase/auth-types": "^0.10.3",
     "@firebase/storage-types": "^0.4.1",
     "@nuxtjs/firebase": "^7.5.0",
-    "core-js": "^3.11.1",
+    "core-js": "^3.25.3",
     "firebase": "^8.4.2",
     "nuxt": "^2.15.3",
     "vue2-datepicker": "^3.9.0"
