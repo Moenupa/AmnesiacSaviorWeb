@@ -15,7 +15,7 @@
     "core-js": "^3.11.1",
     "firebase": "^8.4.2",
     "nuxt": "^2.15.3",
-    "vue2-datepicker": "^3.9.0"
+    "vue2-datepicker": "^3.11.1"
   },
   "devDependencies": {},
   "engines": {
